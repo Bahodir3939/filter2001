@@ -24,6 +24,10 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+app.get("/test", (req, res) => {
+  res.send("WORKING");
+});
+
 // Property API
 app.get("/property", (req, res) => {
   const { range, bedroom } = req.query;
