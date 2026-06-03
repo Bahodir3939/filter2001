@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/test", (req, res) => {
-  res.send("WORKING");
+  res.send("WORKING V2");
 });
 
 // Property API
