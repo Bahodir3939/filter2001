@@ -2,9 +2,7 @@ const fetchProperties = async (range, bedroom) => {
   const params = new URLSearchParams();
   params.append("range", range);
   params.append("bedroom", bedroom);
-  const res = await fetch(`http://localhost:4000/property?${params}`);
-  const data = await res.json();
-
+const res = await fetch(`/property?${params}`);
   renderPropertiesUI(data);
   initialPrice(data);
 };
@@ -19,9 +17,7 @@ const renderPropertiesUI = (properties) => {
     const div = document.createElement("div");
     div.classList.add("property-card");
     div.innerHTML = `
-        <img src="http://localhost:4000/${property.image}" alt="Property Image" />
-        <div class="info">
-            <h3>${property.name}</h3>
+<img src="/${property.image}" alt="Property Image" />            <h3>${property.name}</h3>
             <p>$${property.price} / month</p>
         </div>
         `;

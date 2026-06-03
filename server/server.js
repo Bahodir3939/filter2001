@@ -3,14 +3,28 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { filterProperties } from "./db.js";
 import compression from "compression";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.json());
 app.use(cors());
-app.use(express.static("public"));
 app.use(compression());
 
+app.use(express.static(path.join(__dirname, "public")));
+
+// Home page
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Property API
 app.get("/property", (req, res) => {
   const { range, bedroom } = req.query;
 
@@ -18,14 +32,14 @@ app.get("/property", (req, res) => {
     range: JSON.parse(range),
     bedroom,
   };
-  console.log(filterOptions);
-  console.log(filterOptions.range[0]);
-  console.log(filterOptions.range[1]);
 
   const filteredProperties = filterProperties(filterOptions);
-  res.send(filteredProperties);
+
+  res.json(filteredProperties);
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`server is running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(`server is running on port ${PORT}`);
 });
