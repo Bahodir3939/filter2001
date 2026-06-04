@@ -8,7 +8,10 @@ const fetchProperties = async (range, bedroom) => {
   const data = await res.json();
 
   renderPropertiesUI(data);
-  initialPrice(data);
+
+  if (data.length > 0) {
+    initialPrice(data);
+  }
 };
 
 fetchProperties("[0,10000]", "any");
@@ -40,11 +43,8 @@ const renderPropertiesUI = (properties) => {
 const initialPrice = (properties) => {
   const prices = properties.map((pro) => pro.price);
 
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-
-  document.getElementById("min-price").value = minPrice;
-  document.getElementById("max-price").value = maxPrice;
+  document.getElementById("min-price").value = Math.min(...prices);
+  document.getElementById("max-price").value = Math.max(...prices);
 };
 
 document.getElementById("form").addEventListener("submit", (e) => {
@@ -57,7 +57,7 @@ document.getElementById("form").addEventListener("submit", (e) => {
 
   const range = `[${minPrice},${maxPrice}]`;
 
-  const bedroom = formData.get("bedroom");
+  const bedroom = formData.get("bedroom") || "any";
 
   fetchProperties(range, bedroom);
 });

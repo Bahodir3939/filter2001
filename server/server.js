@@ -30,20 +30,19 @@ app.get("/test", (req, res) => {
 
 // Property API
 app.get("/property", (req, res) => {
-  const { range, bedroom } = req.query;
+  try {
+    const { range, bedroom } = req.query;
 
-  const filterOptions = {
-    range: JSON.parse(range),
-    bedroom,
-  };
+    const filterOptions = {
+      range: range ? JSON.parse(range) : [0, 10000],
+      bedroom: bedroom || "any",
+    };
 
-  const filteredProperties = filterProperties(filterOptions);
+    const filteredProperties = filterProperties(filterOptions);
 
-  res.json(filteredProperties);
-});
-
-const PORT = process.env.PORT || 10000;
-
-app.listen(PORT, () => {
-  console.log(`server is running on port ${PORT}`);
+    res.json(filteredProperties);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
