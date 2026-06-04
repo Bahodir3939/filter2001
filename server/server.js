@@ -1,82 +1,43 @@
-const fetchProperties = async (range, bedroom) => {
-  const params = new URLSearchParams();
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { filterProperties } from "./db.js";
+import compression from "compression";
+import path from "path";
+import { fileURLToPath } from "url";
 
-  params.append("range", range);
-  params.append("bedroom", bedroom);
+dotenv.config();
 
-  const res = await fetch(`/property?${params}`);
-  const data = await res.json();
+const app = express();
 
-  renderPropertiesUI(data);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  if (data.length > 0) {
-    initialPrice(data);
-  }
-};
+app.use(express.json());
+app.use(cors());
+app.use(compression());
 
-fetchProperties("[0,10000]", "any");
+app.use(express.static(path.join(__dirname, "public")));
 
-const renderPropertiesUI = (properties) => {
-  const contDiv = document.getElementById("main-content");
-  contDiv.innerHTML = "";
-
-  const propertyCards = properties.map((property) => {
-    const div = document.createElement("div");
-
-    div.classList.add("property-card");
-
-    div.innerHTML = `
-      <img src="/${property.image}" alt="Property Image" />
-      <div class="info">
-        <h3>${property.name}</h3>
-        <p>$${property.price} / month</p>
-      </div>
-    `;
-
-    return div;
-  });
-
-  contDiv.append(...propertyCards);
-};
-
-const initialPrice = (properties) => {
-  const prices = properties.map((pro) => pro.price);
-
-  document.getElementById("min-price").value = Math.min(...prices);
-  document.getElementById("max-price").value = Math.max(...prices);
-};
-
-document.getElementById("form").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const formData = new FormData(e.target);
-
-  const minPrice = formData.get("min-price") || 0;
-  const maxPrice = formData.get("max-price") || 10000;
-
-  const range = `[${minPrice},${maxPrice}]`;
-  const bedroom = formData.get("bedroom") || "any";
-
-  fetchProperties(range, bedroom);
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
 app.get("/property", (req, res) => {
-  try {
-    const { range, bedroom } = req.query;
+  const { range, bedroom } = req.query;
 
-    const filterOptions = {
-      range: JSON.parse(range),
-      bedroom,
-    };
+  const filterOptions = {
+    range: JSON.parse(range),
+    bedroom,
+  };
 
-    console.log(filterOptions);
+  const filteredProperties = filterProperties(filterOptions);
 
-    const filteredProperties = filterProperties(filterOptions);
+  res.json(filteredProperties);
+});
 
-    res.json(filteredProperties);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      error: err.message,
-    });
-  }
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(`server is running on port ${PORT}`);
 });
