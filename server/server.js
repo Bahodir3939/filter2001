@@ -59,3 +59,24 @@ document.getElementById("form").addEventListener("submit", (e) => {
 
   fetchProperties(range, bedroom);
 });
+app.get("/property", (req, res) => {
+  try {
+    const { range, bedroom } = req.query;
+
+    const filterOptions = {
+      range: JSON.parse(range),
+      bedroom,
+    };
+
+    console.log(filterOptions);
+
+    const filteredProperties = filterProperties(filterOptions);
+
+    res.json(filteredProperties);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+});
