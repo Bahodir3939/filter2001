@@ -61,3 +61,4 @@ document.getElementById("form").addEventListener("submit", (e) => {
 
   fetchProperties(range, bedroom);
 });
+// VERSION 2
